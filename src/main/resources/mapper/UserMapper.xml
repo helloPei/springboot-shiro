@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.UserMapper">
+    <insert id="insertObject" parameterType="com.demo.pojo.User"
+            useGeneratedKeys="true" keyProperty="id">
+    	insert into sys_users
+      	(username, password, deptId, email, mobile, salt, valid,
+      	createdTime, createdUser)
+      	values
+    	(#{username}, #{password}, #{deptId}, #{email}, #{mobile}, #{salt}, #{valid},
+      	#{createdTime}, #{createdUser})
+    </insert>
+    <!-- 用户更新操作(更新自身信息) -->
+    <update id="updateObject" parameterType="com.demo.pojo.User">
+    	update sys_users
+    	<set>
+        	<if test="username!=null and username!=''">
+            	username=#{username},
+            </if>
+            <if test="email!=null and email!=''">
+             	email=#{email},
+            </if>
+            <if test="mobile!=null and mobile!=''">
+                mobile=#{mobile},
+            </if>
+			<if test="deptId!=null and deptId!=''">
+                deptId=#{deptId},
+            </if>
+            <if test="modifiedUser!=null and modifiedUser!=''">
+                modifiedUser=#{modifiedUser},
+            </if>
+            modifiedTime=now()
+    	</set>
+    	where id=#{id}
+	</update>
+    <!-- 对用户信息执行禁用或启用操作 -->
+    <update id="validById">
+    	update sys_users set 
+    	valid=#{valid}, modifiedUser=#{modifiedUser}, modifiedTime=now() 
+    	where id=#{id}
+    </update>
+    <!-- 基于用户名获取用户对象 -->
+    <select id="findUserByUserName" resultType="com.demo.pojo.User">
+    	select * from sys_users where username=#{username}
+    </select>
+    <!-- 按照名字统计记录总数 -->
+    <select id="getRowCount" resultType="int">
+       select count(*) from sys_users
+       <include refid="queryWhereId"/>
+    </select>
+    <!-- 基于id查询用户以及部门信息 -->
+    <select id="findObjectById" resultMap="userDeptResult">
+   		select * from sys_users where id=#{id}
+    </select>
+    <!-- 分页查询用户以及用户对应的部门信息 -->
+    <select id="findPageObjects" resultMap="userDeptResult">
+   		select * from sys_users
+    	<include refid="queryWhereId"/>
+    	order by createdTime desc
+   		limit #{startIndex},#{pageSize}
+    </select>
+    <!-- mybatis中使用sql标签共性sql元素，其它元素中用到了可以借助include直接引入 -->
+	<sql id="queryWhereId">
+    	<where>
+        	<if test="username!=null and username!=''">
+            	username like concat("%",#{username},"%")
+          	</if>
+        </where>
+    </sql>
+    <!-- 借助vo对象关联查询 -->
+    <resultMap type="com.demo.pojo.vo.UserDeptResult" id="userDeptResult">
+   		<!-- 说明：对于此值对象而言
+    	1.直接量类型的值可以通过set方法直接赋值
+    	2.对象类型类型的值可以通过再次查询进行数据封装 -->
+    	<association property="dept" column="deptId"
+    			select="com.demo.mapper.DeptMapper.findById">
+    	</association><!-- 开启二次查询，基于部门id查询部门信息 -->
+   </resultMap>
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.DeptMapper">
+	<insert id="insertObject" parameterType="com.demo.pojo.Dept">
+    	insert into sys_depts
+        (name, sort, note, parentId, createdTime, modifiedTime, createdUser, modifiedUser)
+        values
+        (#{name}, #{sort}, #{note}, #{parentId}, now(), now(), #{createdUser}, #{modifiedUser})
+    </insert>
+    <delete id="deleteObject">
+    	delete from sys_depts where id=#{id}
+    </delete>
+    <update id="updateObject" parameterType="com.demo.pojo.Dept">
+    	update sys_depts set
+        name=#{name}, sort=#{sort}, note=#{note}, parentId=#{parentId},
+        modifiedUser=#{modifiedUser}, modifiedTime=now()
+        where id=#{id}
+    </update>
+    <select id="findZTreeNodes" resultType="com.demo.common.vo.Node">
+        select id, name, parentId from sys_depts
+    </select>
+    <select id="findObjectById" resultType="map">
+        select c.*, p.name parentName 
+        from sys_depts c 
+        left join sys_depts p
+        on c.parentId = p.id
+        where c.id=#{id}
+    </select>
+    <select id="getChildCount" resultType="int">
+         select count(*) from sys_depts where parentId=#{id}
+    </select>
+    <select id="findObjects" resultType="map">
+         select c.*,(
+         select name from sys_depts p where c.parentId=p.id) parentName
+         from sys_depts c
+    </select>
+    <select id="findById" resultType="com.demo.pojo.Dept">
+    	select * from sys_depts where id=#{deptId}
+    </select>
+</mapper>

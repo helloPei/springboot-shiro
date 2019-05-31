@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.MenuMapper">
+    <!-- 添加菜单信息 -->
+    <insert id="insertObject" parameterType="com.demo.pojo.Menu">
+    	insert into sys_menus
+    	(name,url,type,sort,note,parentId,permission,createdTime,modifiedTime,createdUser,modifiedUser)
+    	values
+    	(#{name},#{url},#{type},#{sort},#{note},#{parentId},#{permission},now(),now(),#{createdUser},#{modifiedUser})
+    </insert>
+    <!-- 删除菜单信息 -->
+    <delete id="deleteObject" parameterType="int">
+    	delete from sys_menus where id = #{id}
+    </delete>
+	<!-- 修改菜单信息 -->
+    <update id="updateObject" parameterType="com.demo.pojo.Menu">
+    	update sys_menus set
+        	name = #{name}, 
+        	type = #{type}, 
+        	sort = #{sort}, 
+            url = #{url}, 
+            parentId = #{parentId}, 
+            permission = #{permission},
+            modifiedUser = #{modifiedUser},
+            modifiedTime = now()
+        where id=#{id}
+    </update>
+    <!-- 查询所有菜单以及菜单对应的上级菜单名称 -->
+    <select id="findObjects" resultType="map">
+		SELECT m.*,p.name FROM sys_menus m LEFT JOIN sys_menus p ON m.parentId = p.id
+    </select>
+    <!-- 查询菜单节点数据 -->
+    <select id="findZtreeMenuNodes" resultType="com.demo.common.vo.Node">
+    	select id,parentId,name from sys_menus    
+    </select>
+	
+    <!-- 基于菜单id统计子菜单的个数 -->
+    <select id="getChildCount" parameterType="int" resultType="int">
+          select count(*)from sys_menus where parentId = #{id}    
+    </select>
+    <!-- 基于菜单id获取权限标识 -->
+    <select id="findPermissions" resultType="string">
+    	select permission <!-- sys:user:update -->
+       		from sys_menus where id in 
+      	<foreach collection="menuIds" open="(" close=")" separator="," item="menuId">
+            #{menuId}
+      	</foreach>
+   	</select>
+</mapper>

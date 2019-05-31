@@ -1,0 +1,42 @@
+#服务器配置
+server:
+  port: 8080
+#spring配置
+spring:
+  #数据源配置
+  datasource:
+    #配置mysql数据库
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///jtsys?serverTimezone=CTT
+    username: root
+    password: root
+    #配置dbcp连接池
+    dbcp2:
+      connection-init-sqls: characterEncoding=utf-8
+      initial-size: 5
+      max-idle: 100
+      max-wait-millis: 10000
+      min-idle: 5
+      test-on-borrow: true
+      test-while-idle: true
+      time-between-eviction-runs-millis: 27800
+  #配置thymeleaf视图
+#  thymeleaf:
+#    prefix: classpath:/templates/
+#    suffix: .html
+  #配置JSP视图
+#  mvc:
+#    view:
+#      prefix: /WEB-INF/jsp/
+#      suffix: .jsp
+   
+#配置mybatis框架
+mybatis:
+  #定义Mapper接口映射文件位置
+  mapper-locations: classpath:mapper/*Mapper.xml
+  #定义实体类位置
+  type-aliases-package: com.demo.pojo
+#控制台打印sql语句
+logging:
+  level:
+    com.ming.ssm.mapper: debug
