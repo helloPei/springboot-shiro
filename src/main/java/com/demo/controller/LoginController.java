@@ -54,14 +54,4 @@ public class LoginController {
 			return new JsonResult("未知错误，请联系管理员");
 		}
 	}
-	/**
-	 * Logout登出
-	 * @return
-	 */
-	@RequestMapping("doLogout")
-	public String doLogout() {
-		Subject currentUser = SecurityUtils.getSubject();
-		currentUser.logout();
-		return "login";
-	}
 }
